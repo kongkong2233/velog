@@ -1,0 +1,27 @@
+spring:
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+  application:
+    name: velog
+  datasource:
+    url: jdbc:mysql://localhost:3306/velogdb
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 
+
+server:
+  port: 8080
