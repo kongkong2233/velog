@@ -1,7 +1,9 @@
 package org.example.velog.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -10,6 +12,8 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 @Getter@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +30,7 @@ public class User {
     private String blogName;
     @Column(nullable = false)
     private LocalDateTime registrationDate;
+    private String provider;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
@@ -33,4 +38,13 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
+
+    @PrePersist
+    protected void onCreate() {
+        this.registrationDate = LocalDateTime.now();
+    }
+
+    public void setBlogNameFromEmail() {
+        this.blogName = this.email + ".log";
+    }
 }
