@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>LIKELIONLOG</title>
+</head>
+<body>
+    <h1>Welcome Home!</h1>
+    <p>어서오세요, <span th:text="${username}"></span>님!</p>
+    <form th:action="@{/logout}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <button type="submit">로그아웃</button>
+    </form>
+</body>
+</html>

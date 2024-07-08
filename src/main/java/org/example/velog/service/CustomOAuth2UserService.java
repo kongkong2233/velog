@@ -1,5 +1,7 @@
 package org.example.velog.service;
 
+import org.example.velog.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;

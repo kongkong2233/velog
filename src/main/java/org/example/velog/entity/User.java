@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -38,6 +39,8 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
+    @OneToMany(mappedBy = "user_id", cascade = CascadeType.ALL)
+    private List<Post> posts;
 
     @PrePersist
     protected void onCreate() {
@@ -45,6 +48,6 @@ public class User {
     }
 
     public void setBlogNameFromEmail() {
-        this.blogName = this.email + ".log";
+        this.blogName = this.username + ".log";
     }
 }
