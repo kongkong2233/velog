@@ -18,13 +18,14 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long postId;
     private String title;
+    @Column(columnDefinition = "TEXT")
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User userId;
+    private User author;
 
     @PrePersist
     protected void onCreate() {

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${post.title}">게시글 상세 정보</title>
+    <link rel="stylesheet" href="/css/postDetail.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <h1 th:text="${post.title}"></h1>
+    <div class="top-menu">
+        <div class="top-sub-menu">
+            <span th:text="${post.author.username}"></span>
+            <p th:text="${formattedDate}"></p>
+        </div>
+        <button>팔로우</button>
+    </div>
+    <p th:text="${post.content}" class="content"></p>
+    <a href="/">목록으로 돌아가기</a>
+</body>
+</html>

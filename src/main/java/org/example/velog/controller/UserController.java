@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -60,14 +61,24 @@ public class UserController {
         return "home";
     }
 
-    @GetMapping("/userProfile")
-    public String userProfile(@AuthenticationPrincipal OAuth2User principal, Model model) {
-        String username = principal.getAttribute("login");
-        String email = principal.getAttribute("email");
+    @GetMapping("/@{username}")
+    public String userProfile(@PathVariable(name = "username") String username,
+            @AuthenticationPrincipal OAuth2User principal, Model model) {
+       if (principal == null) {
+           return "redirect:/login";
+       }
 
-        model.addAttribute("username", username);
-        model.addAttribute("email", email);
+       String currentUsername = principal.getAttribute("login");
 
-        return "userProfile";
+       if (!currentUsername.equals(username)) {
+           return "redirect:/error";
+       }
+
+       String email = principal.getAttribute("email");
+
+       model.addAttribute("username", currentUsername);
+       model.addAttribute("email", email);
+
+       return "userProfile";
     }
 }

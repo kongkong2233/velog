@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -30,7 +31,9 @@ public class SecurityConfig {
         http
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/", "/loginform", "/oauth2/**").permitAll()
+                                .requestMatchers("/posts/**").permitAll()
+                                .requestMatchers("/", "/loginform", "/oauth2/**",
+                                        "/css/**", "/images/**", "/js/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2Login ->
@@ -41,7 +44,7 @@ public class SecurityConfig {
                                 )
                                 .loginPage("/oauth2/loginform")
                                 .failureHandler(new SimpleUrlAuthenticationFailureHandler("/oauth2/loginform?error=true"))
-                                .successHandler(new SimpleUrlAuthenticationSuccessHandler("/userProfile"))
+                                .successHandler(new SimpleUrlAuthenticationSuccessHandler("/"))
                         )
                 .formLogin(formLogin ->
                         formLogin
@@ -63,4 +66,9 @@ public class SecurityConfig {
     public SimpleUrlAuthenticationSuccessHandler successHandler() {
         return new SimpleUrlAuthenticationSuccessHandler("/");
     }
+
+//    @Bean
+//    public WebSecurityCustomizer webSecurityCustomizer() {
+//        return (web) -> web.ignoring().requestMatchers("/static/js/**", "/static/image/**", "/static/css/**", "/static/scss/**");
+//    }
 }

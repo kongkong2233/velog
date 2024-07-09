@@ -3,10 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <title>LIKELIONLOG</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/home.css">
 </head>
 <body>
-  <h1>Welcome to LIKELIONLOG!</h1>
-  <p>로그인 후에 더 많은 기능을 사용할 수 있습니다.</p>
-  <a href="/loginform">로그인</a>
+  <div class="top-nav">
+      <p>LIKELIONLOG</p>
+      <a href="/loginform">로그인</a>
+  </div>
+  <div class="grid-container">
+      <div th:each="post : ${posts}">
+          <div class="card" th:attr="data-post-id=${post.postId}" onclick="goToPostDetail(event)">
+              <div class="card-image"></div>
+              <h2 class="card-title" th:text="${post.title}">제목</h2>
+              <p class="card-content" th:text="${#strings.abbreviate(post.content, 100)}">내용 일부</p>
+              <p class="card-footer"><span th:text="${post.author.username}">작성자</span></p>
+          </div>
+      </div>
+  </div>
 </body>
 </html>
+
+<script th:inline="javascript">
+    function goToPostDetail(event) {
+        // 클릭된 카드의 postId 가져오기
+        var postId = event.target.closest('.card').getAttribute('data-post-id');
+        // postId를 이용하여 상세 페이지로 이동
+        window.location.href = '/posts/' + postId;
+    }
+</script>

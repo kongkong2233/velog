@@ -25,10 +25,17 @@ public class UserService {
         return userRepository.save(user);
     }
 
-
-
     public User getUserByUsername(String username) {
         Optional<User> userOptional = userRepository.findByUsername(username);
         return userOptional.orElse(null);
+    }
+
+    public Long findUserIdByUsername(String username) {
+        Optional<User> user = userRepository.findByUsername(username);
+        return user != null ? user.get().getUserId() : null;
+    }
+
+    public User findById(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 }

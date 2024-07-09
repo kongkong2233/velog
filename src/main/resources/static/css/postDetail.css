@@ -1,0 +1,51 @@
+body {
+    padding: 50px 250px 0px 250px;
+}
+
+h1 {
+    font-size: 48px;
+}
+
+.top-menu {
+    width: 100%;
+    display: flex;
+    margin-top: 30px;
+    margin-bottom: 50px;
+    justify-content: space-between;
+}
+
+.top-sub-menu {
+    display: flex;
+    width: 35%;
+    justify-content: space-between;
+    padding-top: 12px;
+}
+
+.top-sub-menu span {
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.top-sub-menu p {
+    font-size: 18px;
+}
+
+.top-menu button {
+    padding: 5px 20px 5px 20px;
+    border-radius: 25px;
+    border: solid 1px #ff7526;
+    color: #ff7526;
+    font-size: 18px;
+    background-color: white;
+    font-weight: 700;
+}
+
+.top-menu button:hover {
+    background-color: #ff7526;
+    color: white;
+    cursor: pointer;
+}
+
+.content {
+    font-size: 18px;
+}
