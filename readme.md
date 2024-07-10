@@ -2,4 +2,16 @@
 ### velog 클론코딩
 
 #### 체크리스트
-    - https://docs.google.com/spreadsheets/d/1wpGsqPrLbHyna1UB9GEPutQhpIcKg-KfEIGgrbqVHLE/edit?gid=695348239#gid=695348239
+- [x] 로그인/회원가입(Oauth2 - github)
+- [x] 로그아웃
+- [x] 메인페이지
+- [ ] 게시물 검색
+- [x] 글 쓰기
+- [ ] 임시 글 저장
+- [ ] 특정 블로그 조회
+- [ ] 시리즈 목록 보기
+- [x] 글 상세보기
+- [ ] 사용자 정보 보기
+- [ ] 회원 탈퇴
+- [x] 댓글 목록 및 기능
+- [ ] 좋아요 기능

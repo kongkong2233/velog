@@ -34,6 +34,7 @@ public class SecurityConfig {
                                 .requestMatchers("/posts/**").permitAll()
                                 .requestMatchers("/", "/loginform", "/oauth2/**",
                                         "/css/**", "/images/**", "/js/**").permitAll()
+                                .requestMatchers("/posts/{postId}/comments").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2Login ->
@@ -57,6 +58,10 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
+                        .clearAuthentication(true)
+                        .addLogoutHandler((request, response, authentication) -> {
+                            response.setHeader("Cache-Control", "no-cache, no-store");
+                        })
                 );
 
         return http.build();
@@ -66,9 +71,4 @@ public class SecurityConfig {
     public SimpleUrlAuthenticationSuccessHandler successHandler() {
         return new SimpleUrlAuthenticationSuccessHandler("/");
     }
-
-//    @Bean
-//    public WebSecurityCustomizer webSecurityCustomizer() {
-//        return (web) -> web.ignoring().requestMatchers("/static/js/**", "/static/image/**", "/static/css/**", "/static/scss/**");
-//    }
 }

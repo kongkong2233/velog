@@ -7,16 +7,31 @@
     <link rel="stylesheet" href="/css/home.css">
 </head>
 <body>
-  <div class="top-nav">
-      <p>LIKELIONLOG</p>
-      <a href="/loginform">로그인</a>
+  <div class="top-nav" th:if="${username == null}">
+      <a href="/" class="home_link">LIKELIONLOG</a>
+      <a href="/loginform" class="login-button">로그인</a>
   </div>
+
+  <div class="top-nav2" th:if="${username != null}">
+      <a href="/" class="home_link">LIKELIONLOG</a>
+      <div class="top-nav2-block">
+          <a th:href="@{'/@' + ${username}}" th:text="${username}"></a>
+          <span>|</span>
+          <a th:href="@{/posts/createform}">글 작성</a>
+          <span>|</span>
+          <form id="logoutForm" th:action="@{/logout}" method="post">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+              <button type="submit">로그아웃</button>
+          </form>
+      </div>
+  </div>
+
   <div class="grid-container">
       <div th:each="post : ${posts}">
           <div class="card" th:attr="data-post-id=${post.postId}" onclick="goToPostDetail(event)">
               <div class="card-image"></div>
               <h2 class="card-title" th:text="${post.title}">제목</h2>
-              <p class="card-content" th:text="${#strings.abbreviate(post.content, 100)}">내용 일부</p>
+              <p class="card-content" th:text="${post.content}">내용 일부</p>
               <p class="card-footer"><span th:text="${post.author.username}">작성자</span></p>
           </div>
       </div>
@@ -30,5 +45,9 @@
         var postId = event.target.closest('.card').getAttribute('data-post-id');
         // postId를 이용하여 상세 페이지로 이동
         window.location.href = '/posts/' + postId;
+    }
+
+    function logout() {
+        document.getElementById('logoutForm').submit();
     }
 </script>

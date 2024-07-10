@@ -3,19 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="${post.title}">게시글 상세 정보</title>
-    <link rel="stylesheet" href="/css/postDetail.css">
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/postDetail.css">
 </head>
 <body>
-    <h1 th:text="${post.title}"></h1>
-    <div class="top-menu">
-        <div class="top-sub-menu">
-            <span th:text="${post.author.username}"></span>
-            <p th:text="${formattedDate}"></p>
-        </div>
-        <button>팔로우</button>
+    <div class="top-nav" th:if="${username == null}">
+        <a href="/" class="home_link">LIKELIONLOG</a>
+        <a href="/loginform" class="login-button">로그인</a>
     </div>
-    <p th:text="${post.content}" class="content"></p>
-    <a href="/">목록으로 돌아가기</a>
+
+    <div class="top-nav2" th:if="${username != null}">
+        <a href="/" class="home_link">LIKELIONLOG</a>
+        <div class="top-nav2-block">
+            <a th:href="@{'/@' + ${username}}" th:text="${username}"></a>
+            <span>|</span>
+            <a th:href="@{/posts/createform}">글 작성</a>
+            <span>|</span>
+            <form id="logoutForm" th:action="@{/logout}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit">로그아웃</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="content-box">
+        <h1 th:text="${post.title}"></h1>
+        <div class="top-menu">
+            <div class="top-sub-menu">
+                <span th:text="${post.author.username}"></span>
+                <p th:text="${formattedDate}"></p>
+            </div>
+            <button>팔로우</button>
+        </div>
+        <div class="blog-content">
+            <p th:utext="${post.content}"></p>
+        </div>
+
+        <div th:if="${#authentication.name == post.author.username}" class="footer-menu">
+            <a th:href="@{/posts/edit/{id}(id=${post.postId})}">수정</a>
+            <form th:action="@{/posts/delete/{id}(id=${post.postId})}" method="post" style="display: inline;">
+                <input type="hidden" name="_method" value="delete">
+                <button type="submit">삭제</button>
+            </form>
+        </div>
+
+        <div class="comments-section">
+            <h2>댓글</h2>
+            <form th:action="@{/posts/{postId}/comments(postId=${post.postId})}" method="post">
+                <textarea name="content" rows="3" required></textarea>
+                <button type="submit">댓글 달기</button>
+            </form>
+
+            <div class="comments-list">
+                <div th:each="comment : ${comments}">
+                    <span th:text="${comment.user.username}">작성자</span>
+                    <p th:text="${comment.content}">댓글 내용</p>
+                    <p th:text="${formattedDate}">작성일</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

@@ -1,5 +1,15 @@
 body {
-    padding: 50px 250px 0px 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+}
+
+.content-box {
+    width: 80%;
+    max-width: 800px;
+    padding: 20px;
+    margin-bottom: 50px;
 }
 
 h1 {
@@ -16,7 +26,7 @@ h1 {
 
 .top-sub-menu {
     display: flex;
-    width: 35%;
+    width: 40%;
     justify-content: space-between;
     padding-top: 12px;
 }
@@ -46,6 +56,99 @@ h1 {
     cursor: pointer;
 }
 
-.content {
+.blog-content {
     font-size: 18px;
+    margin-bottom: 50px;
+}
+
+.footer-menu a {
+    border: solid 1px #ff7526;
+    color: #ff7526;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 25px;
+    padding: 5px 10px 5px 10px;
+    text-decoration: none;
+}
+
+.footer-menu a:hover {
+    background-color: #ff7526;
+    color: white;
+}
+
+.footer-menu button {
+    border: solid 1px #ff7526;
+    color: #ff7526;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 25px;
+    padding: 5px 10px 5px 10px;
+    background-color: white;
+}
+
+.footer-menu button:hover {
+    background-color: #ff7526;
+    color: white;
+    cursor: pointer;
+}
+
+.comments-section {
+    margin-top: 30px;
+}
+
+.comments-section h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.comments-section form {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.comments-section textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.comments-section textarea:focus {
+    outline: solid 1px #ff7526;
+    border: solid 1px #ff7526;
+}
+
+.comments-section button {
+    align-self: flex-end;
+    padding: 10px 20px;
+    background-color: #ff7526;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.comments-section button:hover {
+    background-color: #e66a24;
+}
+
+.comments-list {
+    margin-top: 20px;
+}
+
+.comments-list div {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+}
+
+.comments-list span {
+    font-weight: bold;
+}
+
+.comments-list p {
+    margin: 5px 0;
 }

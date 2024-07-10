@@ -35,8 +35,24 @@ public class PostService {
         return postRepository.findAll();
     }
 
+    public Post getPostById(Long postId) {
+        return postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid post ID"));
+    }
+
     public Post findById(Long postId) {
         Optional<Post> optionalPost = postRepository.findById(postId);
         return optionalPost.orElse(null);
+    }
+
+    public List<Post> findAll() {
+        return postRepository.findAll();
+    }
+
+    public void save(Post post) {
+        postRepository.save(post);
+    }
+
+    public void delete(Post post) {
+        postRepository.delete(post);
     }
 }
