@@ -1,6 +1,7 @@
 package org.example.velog.config;
 
 import org.example.velog.service.CustomOAuth2UserService;
+import org.example.velog.service.CustomUserDetailsService;
 import org.example.velog.service.UserService;
 import org.example.velog.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,14 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    @Autowired
-    private CustomOAuth2UserService customOAuth2UserService;
+
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomUserDetailsService customUserDetailsService;
+
+    public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, CustomUserDetailsService customUserDetailsService) {
+        this.customOAuth2UserService = customOAuth2UserService;
+        this.customUserDetailsService = customUserDetailsService;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -33,6 +40,7 @@ public class SecurityConfig {
                         authorizeRequests
                                 .requestMatchers("/posts/**").permitAll()
                                 .requestMatchers("/", "/loginform", "/oauth2/**",
+                                        "/register", "/login",
                                         "/css/**", "/images/**", "/js/**").permitAll()
                                 .requestMatchers("/posts/{postId}/comments").permitAll()
                                 .anyRequest().authenticated()
@@ -53,6 +61,9 @@ public class SecurityConfig {
                                 .defaultSuccessUrl("/", true)
                                 .permitAll()
                         )
+                .rememberMe(rememberMe -> rememberMe
+                        .userDetailsService(customUserDetailsService)
+                )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/")
@@ -68,7 +79,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SimpleUrlAuthenticationSuccessHandler successHandler() {
-        return new SimpleUrlAuthenticationSuccessHandler("/");
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

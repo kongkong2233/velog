@@ -37,9 +37,4 @@ public class HomeController {
         }
         return "home";
     }
-
-    @GetMapping("/loginform")
-    public String login() {
-        return "login";
-    }
 }

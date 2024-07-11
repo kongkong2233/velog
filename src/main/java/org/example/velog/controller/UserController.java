@@ -10,16 +10,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @Slf4j
@@ -28,6 +28,10 @@ public class UserController {
     private UserService userService;
     @Autowired
     private UserRepository UserRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/oauth2/login")
     @ResponseBody
@@ -93,6 +97,34 @@ public class UserController {
         if (auth != null) {
             new SecurityContextLogoutHandler().logout(request, response, auth);
         }
+        return "redirect:/loginform";
+    }
+
+    @GetMapping("/loginform")
+    public String login(Model model) {
+        return "login";
+    }
+
+    @GetMapping("/register")
+    public String registerForm(Model model) {
+        model.addAttribute("user", new User());
+        return "register";
+    }
+
+    @PostMapping("/register")
+    public String registerUser(User user, Model model) {
+        Optional<User> exisitingUser = userRepository.findByEmail(user.getEmail());
+        System.out.println("Exisiting user: " + exisitingUser);
+
+        if (exisitingUser.isPresent()) {
+            model.addAttribute("error", "해당 이메일은 존재하는 이메일입니다.");
+            return "register";
+        }
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRegistrationDate(LocalDateTime.now());
+        user.setBlogNameFromEmail();
+        userRepository.save(user);
         return "redirect:/loginform";
     }
 }

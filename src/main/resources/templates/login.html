@@ -9,8 +9,20 @@
     <div class="container">
         <div class="centered-box">
             <h1>LOGIN</h1>
+            <form th:action="@{/loginform}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div class="input-box">
+                    <input type="text" id="username" name="username" placeholder="아이디를 입력해주세요" required/><br/>
+                    <input type="password" id="password" name="password" placeholder="비밀번호를 입력해주세요" required/><br/>
+                </div>
+
+                <div class="button-box">
+                    <input type="submit" value="로그인"/>
+                    <a href="/register">회원가입</a>
+                </div>
+            </form>
             <a href="/oauth2/authorization/github" class="github-login">
-                <img src="/images/img.png" alt="GitHub" class="github-icon">
+                <img src="/images/github.png" alt="GitHub" class="github-icon">
                 Login with GitHub</a>
         </div>
     </div>

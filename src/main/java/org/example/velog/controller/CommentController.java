@@ -7,6 +7,7 @@ import org.example.velog.service.CommentService;
 import org.example.velog.service.PostService;
 import org.example.velog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -27,9 +28,22 @@ public class CommentController {
     @PostMapping("/posts/{postId}/comments")
     public String addComment(@PathVariable(name = "postId") Long postId,
                              @RequestParam String content,
-                             @AuthenticationPrincipal OAuth2User principal) {
+                             Authentication authentication,
+                             @AuthenticationPrincipal OAuth2User oAuth2User) {
+        User user;
+        if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.User) {
+            //formLogin
+            String username = ((org.springframework.security.core.userdetails.User) authentication.getPrincipal()).getUsername();
+            user = userService.getUserByUsername(username);
+        } else if (oAuth2User != null) {
+            //OAuth2
+            String username = oAuth2User.getAttribute("login");
+            user = userService.getUserByUsername(username);
+        } else {
+            return "redirect:/loginform";
+        }
+
         Post post = postService.getPostById(postId);
-        User user = userService.getUserByUsername(principal.getAttribute("login"));
 
         Comment comment = new Comment();
         comment.setPost(post);

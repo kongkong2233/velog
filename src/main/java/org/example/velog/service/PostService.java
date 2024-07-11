@@ -5,6 +5,8 @@ import org.example.velog.entity.Post;
 import org.example.velog.entity.User;
 import org.example.velog.repository.PostRepository;
 import org.example.velog.repository.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,9 @@ public class PostService {
 
     @Transactional
     public void createPost(String title, String content, Long userId) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String username = authentication.getName();
+//        User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
 
         Post post = new Post();

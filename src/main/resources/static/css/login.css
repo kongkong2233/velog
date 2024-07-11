@@ -27,25 +27,91 @@ body, html {
     text-align: center;
 }
 
+.centered-box h1 {
+    color: #ff7526;
+}
+
 .github-login {
     text-decoration: none;
-    color: #000000;
+    color: white;
     display: flex;
     align-items: center;
     font-size: 16px; /* 기본 텍스트 크기 설정 */
-    background-color: white;
+    background-color: #ff7526;
     padding: 10px 10px 10px 10px;
     border-radius: 30px;
     font-weight: bold;
-    border: solid 2px #000000;
+    border: none;
+    margin-top: 10px;
+    width: 93.5%;
 }
 
 .github-login:hover {
-    background-color: #e3e3e3;
+    background-color: #da6421;
 }
 
 .github-icon {
     width: 36px; /* 아이콘 너비 */
     height: 36px; /* 아이콘 높이 */
     margin-right: 90px; /* 아이콘과 텍스트 사이의 간격 */
+}
+
+.input-box {
+    margin-bottom: 10px;
+}
+
+.input-box input {
+    width: 91%;
+    padding: 15px 15px 15px 15px;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 5px;
+    border-radius: 25px;
+    border: solid 1px #949494;
+}
+
+.input-box input:focus {
+    outline: solid 2px #ff7526;
+    border: none;
+}
+
+.button-box {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.button-box input {
+    flex: 1;
+    background-color: #ff7526;
+    border: none;
+    color: white;
+    padding: 15px 15px 15px 15px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 1px;
+}
+
+.button-box input:hover {
+    cursor: pointer;
+    background-color: #da6421;
+}
+
+.button-box a {
+    flex: 1;
+    background-color: #ff7526;
+    border: none;
+    color: white;
+    padding: 15px 15px 15px 15px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.button-box a:hover {
+    background-color: #da6421;
 }

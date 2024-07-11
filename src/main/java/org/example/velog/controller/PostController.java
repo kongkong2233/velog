@@ -34,14 +34,25 @@ public class PostController {
     @PostMapping("/posts/createform")
     public String createPost(@RequestParam(name = "title") String title,
                              @RequestParam(name = "content") String content,
-                             @AuthenticationPrincipal OAuth2User principal, Model model) {
-        if (principal != null) {
-            String username = principal.getAttribute("login");
-            Long userId = userService.findUserIdByUsername(username);
+                             Authentication authentication, Model model) {
+        if (authentication != null) {
+            String username;
 
+            if (authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.User) {
+                //formLogin
+                username = ((org.springframework.security.core.userdetails.User) authentication.getPrincipal()).getUsername();
+            } else if (authentication.getPrincipal() instanceof OAuth2User) {
+                //OAuth2
+                OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                username = oAuth2User.getAttribute("login");
+            } else {
+                return "redirect:/loginform";
+            }
+
+            Long userId = userService.findUserIdByUsername(username);
             postService.createPost(title, content, userId);
 
-            return "redirect:/";
+            return  "redirect:/";
         }
         return "redirect:/loginform";
     }
@@ -76,13 +87,25 @@ public class PostController {
 
     @GetMapping("/posts/edit/{id}")
     public String editForm(@PathVariable(name = "id") Long postId, Model model
-    , @AuthenticationPrincipal OAuth2User principal) {
+    , @AuthenticationPrincipal OAuth2User oAuth2User, Authentication authentication) {
         Post post = postService.findById(postId);
         if (post == null) {
             return "error/404";
         }
 
-        User currentUser = userService.findByUsername(principal.getAttribute("login"));
+        User currentUser;
+        if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.User) {
+            //formLogin
+            String username = ((org.springframework.security.core.userdetails.User) authentication.getPrincipal()).getUsername();
+            currentUser = userService.getUserByUsername(username);
+        } else if (oAuth2User != null) {
+            //OAuth2
+            String username = oAuth2User.getAttribute("login");
+            currentUser = userService.getUserByUsername(username);
+        } else {
+            return "redirect:/loginform";
+        }
+
         if (!post.getAuthor().equals(currentUser)) {
             return "error/403";
         }
@@ -93,13 +116,25 @@ public class PostController {
 
     @PostMapping("/posts/edit/{id}")
     public String editPost(@PathVariable(name = "id") Long postId, @ModelAttribute Post updatedPost,
-                           @AuthenticationPrincipal OAuth2User principal) {
+                           @AuthenticationPrincipal OAuth2User oAuth2User, Authentication authentication) {
         Post post = postService.findById(postId);
         if (post == null) {
             return "error/404";
         }
 
-        User currentUser = userService.findByUsername(principal.getAttribute("login"));
+        User currentUser;
+        if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.User) {
+            //formLogin
+            String username = ((org.springframework.security.core.userdetails.User) authentication.getPrincipal()).getUsername();
+            currentUser = userService.getUserByUsername(username);
+        } else if (oAuth2User != null) {
+            //OAuth2
+            String username = oAuth2User.getAttribute("login");
+            currentUser = userService.getUserByUsername(username);
+        } else {
+            return "redirect:/loginform";
+        }
+
         if (!post.getAuthor().equals(currentUser)) {
             return "error/403";
         }
@@ -113,13 +148,26 @@ public class PostController {
     }
 
     @PostMapping("/posts/delete/{id}")
-    public String deletePost(@PathVariable(name = "id") Long postId, @AuthenticationPrincipal OAuth2User principal) {
+    public String deletePost(@PathVariable(name = "id") Long postId, @AuthenticationPrincipal OAuth2User oAuth2User,
+                             Authentication authentication) {
         Post post = postService.findById(postId);
         if (post == null) {
             return "error/404";
         }
 
-        User currentUser = userService.findByUsername(principal.getAttribute("login"));
+        User currentUser;
+        if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.User) {
+            //formLogin
+            String username = ((org.springframework.security.core.userdetails.User) authentication.getPrincipal()).getUsername();
+            currentUser = userService.getUserByUsername(username);
+        } else if (oAuth2User != null) {
+            //OAuth2
+            String username = oAuth2User.getAttribute("login");
+            currentUser = userService.getUserByUsername(username);
+        } else {
+            return "redirect:/loginform";
+        }
+
         if (!post.getAuthor().equals(currentUser)) {
             return "error/403";
         }

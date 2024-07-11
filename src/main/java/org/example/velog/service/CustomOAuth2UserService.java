@@ -1,5 +1,8 @@
 package org.example.velog.service;
 
+import org.example.velog.entity.Role;
+import org.example.velog.entity.User;
+import org.example.velog.repository.RoleRepository;
 import org.example.velog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -13,12 +16,16 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private RoleRepository roleRepository;
+
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) {
         OAuth2User oAuth2User = super.loadUser(userRequest);
@@ -50,9 +57,45 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
             attributes.put("email", primaryEmail);
+
+            saveUser(attributes);
+
             return new DefaultOAuth2User(oAuth2User.getAuthorities(), attributes, "login");
         }
 
         return oAuth2User;
+    }
+
+    private void saveUser(Map<String, Object> attributes) {
+        String email = (String) attributes.get("email");
+        String username = (String) attributes.get("login");
+        String defaultNick = username;
+        String defaultBlogName = username + ".log";
+        String provider = "github";
+
+        Optional<User> existingUser = userRepository.findByEmail(email);
+
+        if (!existingUser.isPresent()) {
+            User newUser = new User();
+            newUser.setEmail(email);
+            newUser.setUsername(username);
+            newUser.setPassword("");
+            newUser.setUserNick(defaultNick);
+            newUser.setProvider(provider);
+            newUser.setBlogName(defaultBlogName);
+            newUser.setRegistrationDate(LocalDateTime.now());
+
+            Role userRole = roleRepository.findByRoleName("USER");
+            if (userRole == null) {
+                userRole = new Role();
+                userRole.setRoleName("USER");
+                roleRepository.save(userRole);
+            }
+            Set<Role> roles = new HashSet<>();
+            roles.add(userRole);
+            newUser.setRoles(roles);
+
+            userRepository.save(newUser);
+        }
     }
 }
