@@ -3,6 +3,7 @@ package org.example.velog.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.example.velog.dto.UserDTO;
 import org.example.velog.entity.User;
 import org.example.velog.repository.UserRepository;
 import org.example.velog.service.UserService;
@@ -26,12 +27,6 @@ import java.util.Optional;
 public class UserController {
     @Autowired
     private UserService userService;
-    @Autowired
-    private UserRepository UserRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/oauth2/login")
     @ResponseBody
@@ -57,15 +52,15 @@ public class UserController {
             return "Error: Missing user information from OAuth2 provider";
         }
 
-        User user = new User();
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setUserNick(userNick);
-        user.setPassword("");
-        user.setProvider("github");
-        user.setBlogNameFromEmail();
+        UserDTO userDTO = new UserDTO();
+        userDTO.setUsername(username);
+        userDTO.setEmail(email);
+        userDTO.setUserNick(userNick);
+        userDTO.setPassword("");
+        userDTO.setProvider("github");
+        userDTO.setBlogNameFromEmail();
 
-        userService.saveUser(user);
+        userService.saveUser(userDTO);
 
         return "home";
     }
@@ -107,24 +102,24 @@ public class UserController {
 
     @GetMapping("/register")
     public String registerForm(Model model) {
-        model.addAttribute("user", new User());
+        model.addAttribute("user", new UserDTO());
         return "register";
     }
 
     @PostMapping("/register")
-    public String registerUser(User user, Model model) {
-        Optional<User> exisitingUser = userRepository.findByEmail(user.getEmail());
-        System.out.println("Exisiting user: " + exisitingUser);
+    public String registerUser(UserDTO userDTO, Model model) {
+        Optional<UserDTO> existingUser = Optional.ofNullable(userService.findByUsername(userDTO.getEmail()));
+        System.out.println("Existing user: " + existingUser);
 
-        if (exisitingUser.isPresent()) {
+        if (existingUser.isPresent()) {
             model.addAttribute("error", "해당 이메일은 존재하는 이메일입니다.");
             return "register";
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRegistrationDate(LocalDateTime.now());
-        user.setBlogNameFromEmail();
-        userRepository.save(user);
+        userDTO.setPassword(userService.encodePassword(userDTO.getPassword()));
+        userDTO.setRegistrationDate(LocalDateTime.now());
+        userDTO.setBlogNameFromEmail();
+        userService.saveUser(userDTO);
         return "redirect:/loginform";
     }
 }

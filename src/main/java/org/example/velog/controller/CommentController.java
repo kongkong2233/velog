@@ -1,5 +1,8 @@
 package org.example.velog.controller;
 
+import org.example.velog.dto.CommentDTO;
+import org.example.velog.dto.PostDTO;
+import org.example.velog.dto.UserDTO;
 import org.example.velog.entity.Comment;
 import org.example.velog.entity.Post;
 import org.example.velog.entity.User;
@@ -30,27 +33,27 @@ public class CommentController {
                              @RequestParam String content,
                              Authentication authentication,
                              @AuthenticationPrincipal OAuth2User oAuth2User) {
-        User user;
+        UserDTO user;
         if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.User) {
             //formLogin
             String username = ((org.springframework.security.core.userdetails.User) authentication.getPrincipal()).getUsername();
-            user = userService.getUserByUsername(username);
+            user = userService.getUserDTOByUsername(username);
         } else if (oAuth2User != null) {
             //OAuth2
             String username = oAuth2User.getAttribute("login");
-            user = userService.getUserByUsername(username);
+            user = userService.getUserDTOByUsername(username);
         } else {
             return "redirect:/loginform";
         }
 
-        Post post = postService.getPostById(postId);
+        PostDTO post = postService.getPostById(postId);
 
-        Comment comment = new Comment();
-        comment.setPost(post);
-        comment.setUser(user);
-        comment.setContent(content);
+        CommentDTO commentDTO = new CommentDTO();
+        commentDTO.setPostId(postId);
+        commentDTO.setUserId(user.getUserId());
+        commentDTO.setContent(content);
 
-        commentService.saveComment(comment);
+        commentService.saveComment(commentDTO);
 
         return "redirect:/posts/" + postId;
     }

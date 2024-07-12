@@ -1,63 +1,99 @@
 package org.example.velog.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.velog.dto.PostDTO;
 import org.example.velog.entity.Post;
 import org.example.velog.entity.User;
 import org.example.velog.repository.PostRepository;
 import org.example.velog.repository.UserRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @Transactional
-    public void createPost(String title, String content, Long userId) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String username = authentication.getName();
-//        User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
-
-        Post post = new Post();
-        post.setTitle(title);
-        post.setContent(content);
-        post.setAuthor(user);
+    public PostDTO createPost(PostDTO postDTO) {
+        Post post = convertToEntity(postDTO);
         post.setCreatedAt(LocalDateTime.now());
-
-        postRepository.save(post);
+        post.setUpdatedAt(LocalDateTime.now());
+        Post savedPost = postRepository.save(post);
+        return convertToDTO(savedPost);
     }
 
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    public List<PostDTO> getAllPosts() {
+        return postRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
-    public Post getPostById(Long postId) {
-        return postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid post ID"));
+    public PostDTO getPostById(Long postId) {
+        return postRepository.findById(postId)
+                .map(this::convertToDTO)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid post ID"));
     }
 
-    public Post findById(Long postId) {
-        Optional<Post> optionalPost = postRepository.findById(postId);
-        return optionalPost.orElse(null);
+    public PostDTO findById(Long postId) {
+        Post post = postRepository.findById(postId).orElse(null);
+        return post != null ? convertToDTO(post) : null;
+    }
+
+    public Post findPostEntityById(Long postId) {
+        return postRepository.findById(postId).orElse(null);
     }
 
     public List<Post> findAll() {
         return postRepository.findAll();
     }
 
-    public void save(Post post) {
+    public void save(PostDTO postDTO) {
+        Post post = postRepository.findById(postDTO.getPostId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid post ID"));
+        post.setTitle(postDTO.getTitle());
+        post.setContent(postDTO.getContent());
+        post.setUpdatedAt(postDTO.getUpdatedAt());
+
         postRepository.save(post);
     }
 
-    public void delete(Post post) {
+    public void delete(PostDTO postDTO) {
+        Post post = postRepository.findById(postDTO.getPostId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid post ID"));
+
         postRepository.delete(post);
+    }
+
+    private PostDTO convertToDTO(Post post) {
+        PostDTO postDTO = new PostDTO();
+        postDTO.setPostId(post.getPostId());
+        postDTO.setTitle(post.getTitle());
+        postDTO.setContent(post.getContent());
+        postDTO.setCreatedAt(post.getCreatedAt());
+        postDTO.setUpdatedAt(post.getUpdatedAt());
+        postDTO.setAuthorId(post.getAuthor().getUserId());
+        postDTO.setAuthorName(post.getAuthor().getUsername());
+        return postDTO;
+    }
+
+    private Post convertToEntity(PostDTO postDTO) {
+        Post post = new Post();
+        post.setPostId(postDTO.getPostId());
+        post.setTitle(postDTO.getTitle());
+        post.setContent(postDTO.getContent());
+        post.setCreatedAt(postDTO.getCreatedAt());
+        post.setUpdatedAt(postDTO.getUpdatedAt());
+
+        User author = userService.findUserEntityById(postDTO.getAuthorId());
+        post.setAuthor(author);
+        return post;
     }
 }

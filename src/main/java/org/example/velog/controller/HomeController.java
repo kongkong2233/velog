@@ -1,5 +1,6 @@
 package org.example.velog.controller;
 
+import org.example.velog.dto.PostDTO;
 import org.example.velog.entity.Post;
 import org.example.velog.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,8 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model, @AuthenticationPrincipal OAuth2User principal, CsrfToken csrfToken) {
-        List<Post> posts = postService.getAllPosts();
-        model.addAttribute("posts", posts);
+        List<PostDTO> postDTOs = postService.getAllPosts();
+        model.addAttribute("posts", postDTOs);
 
         model.addAttribute("_csrfToken", csrfToken);
 

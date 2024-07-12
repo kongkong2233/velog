@@ -30,7 +30,7 @@
         <h1 th:text="${post.title}"></h1>
         <div class="top-menu">
             <div class="top-sub-menu">
-                <span th:text="${post.author.username}"></span>
+                <span th:text="${post.authorName}"></span>
                 <p th:text="${formattedDate}"></p>
             </div>
             <button>팔로우</button>
@@ -39,7 +39,7 @@
             <p th:utext="${post.content}"></p>
         </div>
 
-        <div th:if="${#authentication.name == post.author.username}" class="footer-menu">
+        <div th:if="${#authentication.name == post.authorName}" class="footer-menu">
             <a th:href="@{/posts/edit/{id}(id=${post.postId})}">수정</a>
             <form th:action="@{/posts/delete/{id}(id=${post.postId})}" method="post" style="display: inline;">
                 <input type="hidden" name="_method" value="delete">
@@ -56,7 +56,7 @@
 
             <div class="comments-list">
                 <div th:each="comment : ${comments}">
-                    <span th:text="${comment.user.username}">작성자</span>
+                    <span th:text="${comment.username}">작성자</span>
                     <p th:text="${comment.content}">댓글 내용</p>
                     <p th:text="${formattedDate}">작성일</p>
                 </div>

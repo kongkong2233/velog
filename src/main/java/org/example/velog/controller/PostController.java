@@ -1,6 +1,9 @@
 package org.example.velog.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.velog.dto.CommentDTO;
+import org.example.velog.dto.PostDTO;
+import org.example.velog.dto.UserDTO;
 import org.example.velog.entity.Comment;
 import org.example.velog.entity.Post;
 import org.example.velog.entity.User;
@@ -50,7 +53,11 @@ public class PostController {
             }
 
             Long userId = userService.findUserIdByUsername(username);
-            postService.createPost(title, content, userId);
+            PostDTO postDTO = new PostDTO();
+            postDTO.setTitle(title);
+            postDTO.setContent(content);
+            postDTO.setAuthorId(userId);
+            postService.createPost(postDTO);
 
             return  "redirect:/";
         }
@@ -59,8 +66,8 @@ public class PostController {
 
     @GetMapping("/posts/{postId}")
     public String getPostDetail(@PathVariable(name = "postId") Long postId, Model model) {
-        Post post = postService.findById(postId);
-        if (post == null) {
+        PostDTO postDTO = postService.findById(postId);
+        if (postDTO == null) {
             return "error/404";
         }
 
@@ -75,38 +82,38 @@ public class PostController {
         }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일");
-        String formattedDate = post.getCreatedAt().format(formatter);
+        String formattedDate = postDTO.getCreatedAt().format(formatter);
 
-        model.addAttribute("post", post);
+        model.addAttribute("post", postDTO);
         model.addAttribute("formattedDate", formattedDate);
 
-        List<Comment> comments = commentService.getCommentByPostId(postId);
-        model.addAttribute("comments", comments);
+        List<CommentDTO> commentDTOs = commentService.getCommentByPostId(postId);
+        model.addAttribute("comments", commentDTOs);
         return "postDetail";
     }
 
     @GetMapping("/posts/edit/{id}")
     public String editForm(@PathVariable(name = "id") Long postId, Model model
     , @AuthenticationPrincipal OAuth2User oAuth2User, Authentication authentication) {
-        Post post = postService.findById(postId);
+        PostDTO post = postService.getPostById(postId);
         if (post == null) {
             return "error/404";
         }
 
-        User currentUser;
+        UserDTO currentUser;
         if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.User) {
             //formLogin
             String username = ((org.springframework.security.core.userdetails.User) authentication.getPrincipal()).getUsername();
-            currentUser = userService.getUserByUsername(username);
+            currentUser = userService.getUserDTOByUsername(username);
         } else if (oAuth2User != null) {
             //OAuth2
             String username = oAuth2User.getAttribute("login");
-            currentUser = userService.getUserByUsername(username);
+            currentUser = userService.getUserDTOByUsername(username);
         } else {
             return "redirect:/loginform";
         }
 
-        if (!post.getAuthor().equals(currentUser)) {
+        if (!post.getAuthorId().equals(currentUser.getUserId())) {
             return "error/403";
         }
 
@@ -115,34 +122,33 @@ public class PostController {
     }
 
     @PostMapping("/posts/edit/{id}")
-    public String editPost(@PathVariable(name = "id") Long postId, @ModelAttribute Post updatedPost,
+    public String editPost(@PathVariable(name = "id") Long postId, @ModelAttribute PostDTO updatedPost,
                            @AuthenticationPrincipal OAuth2User oAuth2User, Authentication authentication) {
-        Post post = postService.findById(postId);
+        PostDTO post = postService.getPostById(postId);
         if (post == null) {
             return "error/404";
         }
 
-        User currentUser;
+        UserDTO currentUser;
         if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.User) {
             //formLogin
             String username = ((org.springframework.security.core.userdetails.User) authentication.getPrincipal()).getUsername();
-            currentUser = userService.getUserByUsername(username);
+            currentUser = userService.getUserDTOByUsername(username);
         } else if (oAuth2User != null) {
             //OAuth2
             String username = oAuth2User.getAttribute("login");
-            currentUser = userService.getUserByUsername(username);
+            currentUser = userService.getUserDTOByUsername(username);
         } else {
             return "redirect:/loginform";
         }
 
-        if (!post.getAuthor().equals(currentUser)) {
+        if (!post.getAuthorId().equals(currentUser.getUserId())) {
             return "error/403";
         }
 
-        post.setTitle(updatedPost.getTitle());
-        post.setContent(updatedPost.getContent());
-        post.setUpdatedAt(LocalDateTime.now());
-        postService.save(post);
+        updatedPost.setPostId(postId);
+        updatedPost.setUpdatedAt(LocalDateTime.now());
+        postService.save(updatedPost);
 
         return "redirect:/posts/" + post.getPostId();
     }
@@ -150,25 +156,25 @@ public class PostController {
     @PostMapping("/posts/delete/{id}")
     public String deletePost(@PathVariable(name = "id") Long postId, @AuthenticationPrincipal OAuth2User oAuth2User,
                              Authentication authentication) {
-        Post post = postService.findById(postId);
+        PostDTO post = postService.getPostById(postId);
         if (post == null) {
             return "error/404";
         }
 
-        User currentUser;
+        UserDTO currentUser;
         if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.User) {
             //formLogin
             String username = ((org.springframework.security.core.userdetails.User) authentication.getPrincipal()).getUsername();
-            currentUser = userService.getUserByUsername(username);
+            currentUser = userService.getUserDTOByUsername(username);
         } else if (oAuth2User != null) {
             //OAuth2
             String username = oAuth2User.getAttribute("login");
-            currentUser = userService.getUserByUsername(username);
+            currentUser = userService.getUserDTOByUsername(username);
         } else {
             return "redirect:/loginform";
         }
 
-        if (!post.getAuthor().equals(currentUser)) {
+        if (!post.getAuthorId().equals(currentUser.getUserId())) {
             return "error/403";
         }
 
