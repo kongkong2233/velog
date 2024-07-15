@@ -1,5 +1,6 @@
 package org.example.velog.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.velog.service.CustomOAuth2UserService;
 import org.example.velog.service.CustomUserDetailsService;
 import org.example.velog.service.UserService;
@@ -23,6 +24,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
+@Slf4j
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;

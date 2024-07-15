@@ -2,7 +2,9 @@ package org.example.velog.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.velog.dto.UserDTO;
+import org.example.velog.entity.Role;
 import org.example.velog.entity.User;
+import org.example.velog.repository.RoleRepository;
 import org.example.velog.repository.UserRepository;
 import org.example.velog.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +29,28 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private RoleRepository roleRepository;
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = new BCryptPasswordEncoder();
+    }
 
     public UserDTO saveUser(UserDTO userDTO) {
         User user = convertToEntity(userDTO);
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
         user.setRegistrationDate(LocalDateTime.now());
         user.setBlogNameFromEmail();
+
+        Role userRole = roleRepository.findByRoleName("USER").orElseGet(() -> {
+            Role newRole = new Role();
+            newRole.setRoleName("USER");
+            return roleRepository.save(newRole);
+        });
+        user.setRoles(Set.of(userRole));
+
         User savedUser = userRepository.save(user);
         return convertToDTO(savedUser);
     }

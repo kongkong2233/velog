@@ -1,5 +1,6 @@
 package org.example.velog.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.velog.entity.Role;
 import org.example.velog.entity.User;
 import org.example.velog.repository.RoleRepository;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@Slf4j
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @Autowired
     private UserRepository userRepository;
@@ -85,12 +87,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             newUser.setBlogName(defaultBlogName);
             newUser.setRegistrationDate(LocalDateTime.now());
 
-            Role userRole = roleRepository.findByRoleName("USER");
-            if (userRole == null) {
+            Optional<Role> userRoleOptional = roleRepository.findByRoleName("USER");
+            Role userRole;
+
+            if (userRoleOptional.isEmpty()) {
                 userRole = new Role();
                 userRole.setRoleName("USER");
-                roleRepository.save(userRole);
+                userRole = roleRepository.save(userRole);
+            } else {
+                userRole = userRoleOptional.get();
             }
+
             Set<Role> roles = new HashSet<>();
             roles.add(userRole);
             newUser.setRoles(roles);

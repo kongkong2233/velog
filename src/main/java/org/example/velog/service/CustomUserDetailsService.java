@@ -1,5 +1,6 @@
 package org.example.velog.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.velog.entity.User;
 import org.example.velog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
@@ -22,13 +24,15 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findByUsername(username);
-        if (user == null) {
+        if (user.isEmpty()) {
+            log.error("User not found");
             throw new UsernameNotFoundException("User not found");
         }
 
         Set<GrantedAuthority> grantedAuthorities = user.get().getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
                 .collect(Collectors.toSet());
+        log.info("Granted authorities: {}", grantedAuthorities);
 
         return new org.springframework.security.core.userdetails.User(
                 user.get().getUsername(),
