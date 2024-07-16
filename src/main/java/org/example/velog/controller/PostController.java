@@ -9,6 +9,7 @@ import org.example.velog.entity.Post;
 import org.example.velog.entity.User;
 import org.example.velog.service.CommentService;
 import org.example.velog.service.PostService;
+import org.example.velog.service.StorageService;
 import org.example.velog.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,9 +18,11 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -28,6 +31,7 @@ public class PostController {
     private final PostService postService;
     private final UserService userService;
     private final CommentService commentService;
+    private final StorageService storageService;
 
     @GetMapping("/posts/createform")
     public String createForm() {
@@ -35,9 +39,8 @@ public class PostController {
     }
 
     @PostMapping("/posts/createform")
-    public String createPost(@RequestParam(name = "title") String title,
-                             @RequestParam(name = "content") String content,
-                             Authentication authentication, Model model) {
+    public String createPost(@ModelAttribute PostDTO postDTO,
+                             Authentication authentication, @RequestParam(value = "images", required = false) MultipartFile[] images) {
         if (authentication != null) {
             String username;
 
@@ -53,12 +56,21 @@ public class PostController {
             }
 
             Long userId = userService.findUserIdByUsername(username);
-            PostDTO postDTO = new PostDTO();
-            postDTO.setTitle(title);
-            postDTO.setContent(content);
             postDTO.setAuthorId(userId);
-            postService.createPost(postDTO);
 
+            //이미지 처리
+            if (images != null && images.length > 0) {
+                List<String> imageUrls = new ArrayList<>();
+
+                for (MultipartFile image : images) {
+                    String imageUrl = storageService.storeFile(image);
+                    imageUrls.add(imageUrl);
+                }
+
+                postDTO.setImageUrls(imageUrls);
+            }
+
+            postService.createPost(postDTO);
             return  "redirect:/";
         }
         return "redirect:/loginform";

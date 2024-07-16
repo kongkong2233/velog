@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.example.velog.entity.User;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter@Setter
 @NoArgsConstructor
@@ -19,4 +20,5 @@ public class PostDTO {
     private LocalDateTime updatedAt;
     private Long authorId;
     private String authorName;
+    private List<String> imageUrls;
 }

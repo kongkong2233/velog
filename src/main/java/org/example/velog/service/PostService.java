@@ -1,11 +1,15 @@
 package org.example.velog.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.velog.dto.PostDTO;
+import org.example.velog.entity.Image;
 import org.example.velog.entity.Post;
 import org.example.velog.entity.User;
+import org.example.velog.repository.ImageRepository;
 import org.example.velog.repository.PostRepository;
 import org.example.velog.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,10 +20,12 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final ImageRepository imageRepository;
 
     @Transactional
     public PostDTO createPost(PostDTO postDTO) {
@@ -27,6 +33,15 @@ public class PostService {
         post.setCreatedAt(LocalDateTime.now());
         post.setUpdatedAt(LocalDateTime.now());
         Post savedPost = postRepository.save(post);
+
+        if (postDTO.getImageUrls() != null) {
+            List<Image> images = postDTO.getImageUrls().stream()
+                    .map(url -> new Image(null, url, post))
+                    .collect(Collectors.toList());
+            imageRepository.saveAll(images);
+            post.setImages(images);
+        }
+
         return convertToDTO(savedPost);
     }
 
@@ -43,8 +58,17 @@ public class PostService {
     }
 
     public PostDTO findById(Long postId) {
-        Post post = postRepository.findById(postId).orElse(null);
-        return post != null ? convertToDTO(post) : null;
+        Post post = postRepository.findByIdWithImages(postId).orElse(null);
+        PostDTO postDTO = post != null ? convertToDTO(post) : null;
+
+        if (postDTO != null) {
+            log.info("PostDTO: {}", postDTO);
+            if (postDTO.getImageUrls() != null) {
+                log.info("ImageUrl: {}", postDTO.getImageUrls());
+            }
+        }
+
+        return postDTO;
     }
 
     public Post findPostEntityById(Long postId) {
@@ -81,6 +105,14 @@ public class PostService {
         postDTO.setUpdatedAt(post.getUpdatedAt());
         postDTO.setAuthorId(post.getAuthor().getUserId());
         postDTO.setAuthorName(post.getAuthor().getUsername());
+
+        if (post.getImages() != null) {
+            List<String> imageUrls = post.getImages().stream()
+                    .map(Image::getImageUrl)
+                    .collect(Collectors.toList());
+            postDTO.setImageUrls(imageUrls);
+        }
+
         return postDTO;
     }
 

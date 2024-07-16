@@ -38,6 +38,12 @@
         <div class="blog-content">
             <p th:utext="${post.content}"></p>
         </div>
+        <!-- 이미지 출력 -->
+        <div th:if="${post.imageUrls != null}">
+            <div th:each="imageUrl : ${post.imageUrls}">
+                <img th:src="${imageUrl}" alt="게시글 이미지">
+            </div>
+        </div>
 
         <div th:if="${#authentication.name == post.authorName}" class="footer-menu">
             <a th:href="@{/posts/edit/{id}(id=${post.postId})}">수정</a>

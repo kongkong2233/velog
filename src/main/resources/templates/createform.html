@@ -7,12 +7,16 @@
     <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/42.0.0/ckeditor5.css">
 </head>
 <body>
-    <form action="#" th:action="@{/posts/createform}" method="post">
+    <form action="#" th:action="@{/posts/createform}" method="post" enctype="multipart/form-data">
         <div>
             <input type="text" id="title" name="title" class="title-input" placeholder="제목을 입력하세요">
         </div>
         <div>
             <textarea id="editor" name="content"></textarea>
+        </div>
+        <div>
+            <label for="images">이미지 업로드</label>
+            <input type="file" id="images" name="images" accept="image/*" multiple>
         </div>
         <div>
             <button type="submit">출간하기</button>
