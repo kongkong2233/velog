@@ -9,19 +9,20 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 @Service
 public class FileSystemStorageService implements StorageService {
 
-    private final Path rootLocation = Paths.get("/path/to/upload/directory");
-
+    private final Path uploadDir = Paths.get("src/main/resources/static/uploaded-images");
     @Override
     public String storeFile(MultipartFile file) {
         try {
             String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-            Files.copy(file.getInputStream(), this.rootLocation.resolve(fileName));
-            return fileName;
+            Path filePath = uploadDir.resolve(fileName).normalize();
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            return "/static/uploaded-images/" + fileName;
         } catch (Exception e) {
             throw new RuntimeException("FAIL!");
         }

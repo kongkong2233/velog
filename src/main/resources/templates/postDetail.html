@@ -41,7 +41,7 @@
         <!-- 이미지 출력 -->
         <div th:if="${post.imageUrls != null}">
             <div th:each="imageUrl : ${post.imageUrls}">
-                <img th:src="${imageUrl}" alt="게시글 이미지">
+                <img th:src="@{/uploaded-images/{filename}(filename=${imageFilename})}" alt="게시글 이미지">
             </div>
         </div>
 

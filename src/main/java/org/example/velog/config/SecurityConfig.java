@@ -67,7 +67,7 @@ public class SecurityConfig {
                         authorizeRequests
                                 .requestMatchers("/posts/**").permitAll()
                                 .requestMatchers("/", "/loginform", "/oauth2/**",
-                                        "/register", "/login",
+                                        "/register", "/login", "/static/**",
                                         "/css/**", "/images/**", "/js/**").permitAll()
                                 .requestMatchers("/posts/{postId}/comments").permitAll()
                                 .anyRequest().authenticated()

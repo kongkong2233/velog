@@ -9,7 +9,6 @@ import org.example.velog.entity.User;
 import org.example.velog.repository.ImageRepository;
 import org.example.velog.repository.PostRepository;
 import org.example.velog.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,6 +72,13 @@ public class PostService {
 
     public Post findPostEntityById(Long postId) {
         return postRepository.findById(postId).orElse(null);
+    }
+
+    public List<PostDTO> findPostsByUsername(String username) {
+        List<Post> posts = postRepository.findByAuthorUsername(username);
+        return posts.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     public List<Post> findAll() {

@@ -3,9 +3,12 @@ package org.example.velog.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.example.velog.dto.PostDTO;
 import org.example.velog.dto.UserDTO;
+import org.example.velog.entity.Post;
 import org.example.velog.entity.User;
 import org.example.velog.repository.UserRepository;
+import org.example.velog.service.PostService;
 import org.example.velog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -19,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -27,6 +31,8 @@ import java.util.Optional;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private PostService postService;
 
     @GetMapping("/oauth2/login")
     @ResponseBody
@@ -73,15 +79,20 @@ public class UserController {
        }
 
        String currentUsername = principal.getAttribute("login");
-
        if (!currentUsername.equals(username)) {
            return "redirect:/error";
        }
 
-       String email = principal.getAttribute("email");
+       UserDTO userDTO = userService.getUserDTOByUsername(username);
+       if (userDTO == null) {
+           return "redirect:/error";
+       }
 
-       model.addAttribute("username", currentUsername);
-       model.addAttribute("email", email);
+       List<PostDTO> userPosts = postService.findPostsByUsername(username);
+
+       model.addAttribute("user", userDTO);
+       model.addAttribute("userPosts", userPosts);
+       model.addAttribute("currentUsername", currentUsername);
 
        return "userProfile";
     }
