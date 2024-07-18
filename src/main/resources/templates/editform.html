@@ -7,17 +7,14 @@
     <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/42.0.0/ckeditor5.css">
 </head>
 <body>
-    <form th:action="@{/posts/edit/{id}(id=${post.postId})}" method="post">
+    <form th:action="@{/posts/edit/{id}(id=${post.postId})}" method="post" enctype="multipart/form-data">
         <div>
             <input type="text" id="title" name="title" class="title-input" th:value="${post.title}" required>
         </div>
         <div>
             <textarea id="editor" name="content" required th:text="${post.content}"></textarea>
         </div>
-<!--        <div>-->
-<!--            <label for="images">Images:</label>-->
-<!--            <input type="file" id="images" name="images" multiple><br>-->
-<!--        </div>-->
+        <input type="file" name="images" multiple>
         <div>
             <button type="submit">수정</button>
         </div>

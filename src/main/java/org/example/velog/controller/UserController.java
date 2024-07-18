@@ -11,7 +11,10 @@ import org.example.velog.repository.UserRepository;
 import org.example.velog.service.PostService;
 import org.example.velog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,6 +36,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private PostService postService;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @GetMapping("/oauth2/login")
     @ResponseBody
@@ -106,9 +111,21 @@ public class UserController {
         return "redirect:/loginform";
     }
 
-    @GetMapping("/loginform")
-    public String login(Model model) {
-        return "login";
+    @GetMapping("/login")
+    public String loginForm(@ModelAttribute("userDTO") UserDTO userDTO) {
+        log.info("userDTO: " + userDTO);
+        String username = userDTO.getUsername();
+        String password = userDTO.getPassword();
+        log.info("username: " + username + ", password: " + password);
+
+        try {
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
+            Authentication authentication = authenticationManager.authenticate(token);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            return "redirect:/";
+        } catch (AuthenticationException e) {
+            return "login";
+        }
     }
 
     @GetMapping("/register")

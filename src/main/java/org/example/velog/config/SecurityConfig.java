@@ -84,8 +84,12 @@ public class SecurityConfig {
                         )
                 .formLogin(formLogin ->
                         formLogin
-                                .loginPage("/loginform")
+                                .loginPage("/login")
+                                .loginProcessingUrl("/login")
                                 .defaultSuccessUrl("/", true)
+                                .failureUrl("/login?error=true")
+                                .usernameParameter("username")
+                                .passwordParameter("password")
                                 .permitAll()
                         )
                 .rememberMe(rememberMe -> rememberMe

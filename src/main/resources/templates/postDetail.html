@@ -9,7 +9,7 @@
 <body>
     <div class="top-nav" th:if="${username == null}">
         <a href="/" class="home_link">LIKELIONLOG</a>
-        <a href="/loginform" class="login-button">로그인</a>
+        <a href="/login" class="login-button">로그인</a>
     </div>
 
     <div class="top-nav2" th:if="${username != null}">
@@ -37,11 +37,10 @@
         </div>
         <div class="blog-content">
             <p th:utext="${post.content}"></p>
-        </div>
-        <!-- 이미지 출력 -->
-        <div th:if="${post.imageUrls != null}">
-            <div th:each="imageUrl : ${post.imageUrls}">
-                <img th:src="@{/uploaded-images/{filename}(filename=${imageFilename})}" alt="게시글 이미지">
+            <div th:if="${post.imageUrls != null}">
+                <div th:each="imageUrl : ${post.imageUrls}">
+                    <img th:src="@{${imageUrl}}" alt="게시글 이미지">
+                </div>
             </div>
         </div>
 

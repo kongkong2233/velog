@@ -4,12 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.velog.dto.CommentDTO;
 import org.example.velog.dto.PostDTO;
 import org.example.velog.dto.UserDTO;
-import org.example.velog.entity.Comment;
-import org.example.velog.entity.Post;
-import org.example.velog.entity.User;
 import org.example.velog.service.CommentService;
 import org.example.velog.service.PostService;
-import org.example.velog.service.StorageService;
 import org.example.velog.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,10 +16,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
@@ -31,7 +30,6 @@ public class PostController {
     private final PostService postService;
     private final UserService userService;
     private final CommentService commentService;
-    private final StorageService storageService;
 
     @GetMapping("/posts/createform")
     public String createForm() {
@@ -40,7 +38,8 @@ public class PostController {
 
     @PostMapping("/posts/createform")
     public String createPost(@ModelAttribute PostDTO postDTO,
-                             Authentication authentication, @RequestParam(value = "images", required = false) MultipartFile[] images) {
+                             Authentication authentication,
+                             @RequestParam(value = "images", required = false) MultipartFile[] images) {
         if (authentication != null) {
             String username;
 
@@ -58,15 +57,12 @@ public class PostController {
             Long userId = userService.findUserIdByUsername(username);
             postDTO.setAuthorId(userId);
 
-            //이미지 처리
             if (images != null && images.length > 0) {
                 List<String> imageUrls = new ArrayList<>();
-
                 for (MultipartFile image : images) {
-                    String imageUrl = storageService.storeFile(image);
+                    String imageUrl = saveImage(image);
                     imageUrls.add(imageUrl);
                 }
-
                 postDTO.setImageUrls(imageUrls);
             }
 
@@ -74,6 +70,20 @@ public class PostController {
             return  "redirect:/";
         }
         return "redirect:/loginform";
+    }
+
+    private String saveImage(MultipartFile image) {
+        try {
+            String projectPath = System.getProperty("user.dir") + "/src/main/resources/static/images";
+            UUID uuid = UUID.randomUUID();
+            String fileName = uuid + "_" + image.getOriginalFilename();
+            File saveFile = new File(projectPath, fileName);
+            image.transferTo(saveFile);
+            return "/images/" + fileName;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "/images/default.png";
+        }
     }
 
     @GetMapping("/posts/{postId}")
@@ -134,8 +144,11 @@ public class PostController {
     }
 
     @PostMapping("/posts/edit/{id}")
-    public String editPost(@PathVariable(name = "id") Long postId, @ModelAttribute PostDTO updatedPost,
-                           @AuthenticationPrincipal OAuth2User oAuth2User, Authentication authentication) {
+    public String editPost(@PathVariable(name = "id") Long postId,
+                           @ModelAttribute PostDTO updatedPost,
+                           @AuthenticationPrincipal OAuth2User oAuth2User,
+                           Authentication authentication,
+                           @RequestParam(value = "images", required = false) MultipartFile[] images) {
         PostDTO post = postService.getPostById(postId);
         if (post == null) {
             return "error/404";
@@ -156,6 +169,15 @@ public class PostController {
 
         if (!post.getAuthorId().equals(currentUser.getUserId())) {
             return "error/403";
+        }
+
+        if (images != null && images.length > 0) {
+            List<String> imageUrls = new ArrayList<>();
+            for (MultipartFile image : images) {
+                String imageUrl = saveImage(image);
+                imageUrls.add(imageUrl);
+            }
+            updatedPost.setImageUrls(imageUrls);
         }
 
         updatedPost.setPostId(postId);

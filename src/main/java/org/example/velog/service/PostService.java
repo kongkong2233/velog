@@ -35,10 +35,10 @@ public class PostService {
 
         if (postDTO.getImageUrls() != null) {
             List<Image> images = postDTO.getImageUrls().stream()
-                    .map(url -> new Image(null, url, post))
+                    .map(url -> new Image(url, post))
                     .collect(Collectors.toList());
             imageRepository.saveAll(images);
-            post.setImages(images);
+            savedPost.setImages(images);
         }
 
         return convertToDTO(savedPost);
@@ -92,6 +92,13 @@ public class PostService {
         post.setContent(postDTO.getContent());
         post.setUpdatedAt(postDTO.getUpdatedAt());
 
+        if (postDTO.getImageUrls() != null) {
+            List<Image> images = postDTO.getImageUrls().stream()
+                    .map(url -> new Image(url, post))
+                    .collect(Collectors.toList());
+            post.setImages(images);
+            imageRepository.saveAll(images);
+        }
         postRepository.save(post);
     }
 

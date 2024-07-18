@@ -61,6 +61,12 @@ h1 {
     margin-bottom: 50px;
 }
 
+.blog-content img {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+}
+
 .footer-menu a {
     border: solid 1px #ff7526;
     color: #ff7526;

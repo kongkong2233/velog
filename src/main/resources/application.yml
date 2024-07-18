@@ -34,7 +34,7 @@ spring:
             user-name-attribute: login
   web:
     resources:
-      static-locations: classpath:/static/, file:src/main/resources/static/uploaded-images/
+      static-locations: classpath:/static/
   mvc:
     static-path-pattern: /static/**
 
