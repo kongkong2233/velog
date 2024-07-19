@@ -148,6 +148,6 @@ public class UserController {
         userDTO.setRegistrationDate(LocalDateTime.now());
         userDTO.setBlogNameFromEmail();
         userService.saveUser(userDTO);
-        return "redirect:/loginform";
+        return "redirect:/login";
     }
 }
